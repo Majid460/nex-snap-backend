@@ -1,142 +1,157 @@
-📸 NexSnap Backend
-NexSnap is an AI-powered image-to-action system that allows users to snap a photo (of a document, receipt, note, etc.) and automatically classify, extract, and organize that content into useful actions like tasks, events, expenses, or notes.
 
-This backend is built for scalability, reliability, and integration with modern frontend and cloud infrastructure.
+# 📸 NexSnap Backend
 
-🚀 Features
-🔐 User Authentication (JWT based)
+**NexSnap** is an **AI-powered image-to-action system** that allows users to upload a photo (of a document, receipt, note, etc.) and automatically **extract, classify, and convert** the content into structured actions — such as **tasks, events, expenses, or notes**.
 
-📁 Image Upload to Firebase Cloud Storage
+This backend is designed for **scalability**, **cloud readiness**, and **modular integration** with any frontend (mobile/web) and supports dynamic real-time updates using WebSockets.
 
-🧠 OCR Processing using Tesseract.js
+---
 
-🤖 AI Classification via OpenAI (GPT-3.5)
+## 🚀 Features
 
-💾 MongoDB Master-Slave Architecture using Mongoose
+- 🔐 **JWT-Based Authentication**
+- 📤 **Image Upload to Firebase Cloud Storage**
+- 🧠 **OCR Processing via Tesseract.js**
+- 🤖 **AI Classification using OpenAI (GPT-3.5)**
+- 🧱 **MongoDB Replica Set (Master-Slave) Setup**
+- 📊 **Redis Queue Management via BullMQ**
+- 🛠️ **Async Processing with Dedicated Worker**
+- 📡 **Real-time Updates via Socket.IO**
+- ⚙️ **Rate Limiting to Protect API Usage**
+- 🧩 **Modular MVC + Service Architecture**
 
-🔁 Job Queue Processing with Redis & BullMQ
+---
 
-⚙️ Background Workers to handle heavy async tasks
+## 🧱 Tech Stack
 
-🔔 Real-time Updates via Socket.IO
+| Layer        | Tech Stack                                                                 |
+|--------------|-----------------------------------------------------------------------------|
+| Server       | Node.js, Express.js                                                        |
+| Auth         | JWT-based secure authentication                                            |
+| Database     | MongoDB with Master-Slave replica setup using Mongoose                    |
+| OCR          | Tesseract.js                                                               |
+| AI/LLM       | OpenAI GPT-3.5 for classification                                          |
+| Storage      | Firebase Cloud Storage for storing user-uploaded images                   |
+| Queue        | Redis + BullMQ for background OCR + AI processing                         |
+| Realtime     | Socket.IO for live updates when a Snap is processed                       |
+| DevOps       | Docker, dotenv, Render/Vercel deployment ready                            |
 
-📈 Rate Limiting to control API usage
+---
 
-🧪 Modular and extensible controller-service architecture
+## 📂 Folder Structure
 
-📦 Tech Stack
-
-Layer	Technology
-Server	Node.js + Express.js
-Database	MongoDB (Replica Set)
-Auth	JWT
-Storage	Firebase Cloud Storage
-OCR	Tesseract.js
-AI	OpenAI GPT-3.5
-Queue	Redis + BullMQ
-Real-time	Socket.IO
-Background	Worker threads
-DevOps	Docker, dotenv, Vercel/Render ready
-📁 Folder Structure
-bash
-Copy
-Edit
+```
 src/
-├── auth/                  # Authentication logic
+│
+├── auth/              # JWT logic (login/signup)
 │   ├── controller/
 │   └── routes/
+│
 ├── core/
-│   └── data/
-│       ├── models/        # Mongoose models
-│       ├── helper/        # Base response, utilities
-│       ├── sockets/       # Socket.IO server
+│   ├── data/
+│   │   ├── models/    # Mongoose models
+│   │   ├── helper/    # BaseResponse
+│   │   └── sockets/   # Socket.IO server
+│
+├── jobs/              # Worker and BullMQ processor
 ├── services/
-│   ├── ai/                # AI classification service
-│   ├── ocr/               # OCR logic (tesseract)
-├── snap/
-│   ├── controllers/       # Snap CRUD and logic
-│   └── routes/            # Snap-related endpoints
-├── jobs/                 # Redis workers
-├── utils/                # Firebase, JWT, Redis config
-.env
-app.js
-⚙️ How It Works
-User uploads an image → image is sent to Firebase Storage.
+│   ├── ai/            # OpenAI classification
+│   └── ocr/           # OCR logic
+│
+├── snap/              # Snap endpoints
+│   ├── controller/
+│   └── routes/
+│
+├── utils/             # Firebase, Redis, JWT utilities
+├── app.js             # App entry point
+└── .env               # Secrets (ignored by git)
+```
 
-The image is saved in SnapItem with status: pending.
+---
 
-A job is added to Redis Queue for background processing.
+## ⚙️ How It Works
 
-Worker:
+1. User uploads an image via `/api/snap/upload`.
+2. Image is stored in Firebase and a new `SnapItem` is created with status: `pending`.
+3. A job is added to Redis using BullMQ.
+4. Worker script:
+    - Downloads image from Firebase.
+    - Runs OCR via Tesseract.js.
+    - Classifies the text using OpenAI GPT-3.5.
+    - Saves result as `processed`.
+    - Emits a WebSocket event (`snapDone:<snap_id>`) with processed result.
 
-Fetches image URL
+---
 
-Runs OCR
+## 🧪 API Endpoints
 
-Sends text to OpenAI API
+### 🔐 Auth
 
-Classifies as task, event, expense, or note
+```http
+POST   /api/auth/signup      # Signup user
+POST   /api/auth/login       # Login user and get JWT
+```
 
-Saves SnapItem with status: processed
+### 🖼️ Snap
 
-Sends real-time update via Socket.IO
+```http
+POST   /api/snap/upload          # Upload snap (image + queue)
+GET    /api/snap/                # Get all snaps of current user
+GET    /api/snap/processed       # Only processed snaps
+GET    /api/snap/pending         # Only pending snaps
+POST   /api/snap/:id/action      # Convert snap to action
+```
 
-Client listens on a WebSocket room for snap ID → gets instant updates.
+---
 
-🛡️ API Endpoints
-🧾 Auth
-http
-Copy
-Edit
-POST /api/auth/signup
-POST /api/auth/login
-📸 Snap
-http
-Copy
-Edit
-POST /api/snap/upload            # Upload + queue
-GET  /api/snap/                  # All snaps
-GET  /api/snap/processed         # Only processed
-GET  /api/snap/pending           # Only pending
-POST /api/snap/:id/action        # Convert snap to action
-📡 Socket.IO Events
-Client Emits
-joinSnapRoom → { snapId: "<snap_id>" }
+## 📡 Socket.IO
 
-Server Emits
-snapDone:<snap_id> → { message, data: SnapItem }
+### Client-Side Flow:
 
-📦 .env File (Sample)
-env
-Copy
-Edit
-PORT=3000
-MONGODB_CONNECT_URI=mongodb+srv://user:pass@cluster.mongodb.net/db
-JWT_SECRET=supersecurekey
-OPENAI_API_KEY=sk-...
-FIREBASE_STORAGE_BUCKET=nexsnap.firebasestorage.app
-REDIS_URL=redis://default:...
-✅ How to Run
-bash
-Copy
-Edit
-# Install dependencies
+- Connect and emit to `joinSnapRoom`:
+
+```json
+{ "snapId": "<snap_id>" }
+```
+
+- Server emits to `snapDone:<snap_id>`:
+
+```json
+{
+  "message": "Snap processed",
+  "data": { ...full SnapItem document... }
+}
+```
+
+---
+
+## 📌 Rate Limiting
+
+- Using `express-rate-limit` to restrict frequency of requests per user.
+- Prevents OpenAI misuse on free/limited plans.
+
+---
+
+## 🛠️ Dev Tips
+
+- Add your credentials in `.env`:
+```env
+MONGODB_CONNECT_URI=...
+REDIS_URL=...
+OPENAI_API_KEY=...
+FIREBASE_STORAGE_BUCKET=...
+SECRET_KEY=...
+```
+
+- Start the server:
+```bash
 npm install
-
-# Run main server
 npm run dev
+```
 
-# Run Redis Worker
+- Start the Redis Worker:
+```bash
 npm run worker
-🛡️ Security & Best Practices
-Redis eviction policy warning handled via logs
+```
 
-Rate limiting for AI-based endpoints
-
-Snap upload restricted to image/jpeg and image/png
-
-Background jobs run in separate processes
-
-📄 License
-This project is built with ❤️ by Majid as part of Nex-branded SaaS tools. All rights reserved.
-
+---
