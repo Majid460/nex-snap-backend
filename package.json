@@ -1,0 +1,36 @@
+{
+  "name": "nex-snap-backend",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "worker": "node src/jobs/snap_worker.js"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "bullmq": "^5.49.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
+    "firebase-admin": "^13.3.0",
+    "ioredis": "^5.6.1",
+    "mongoose": "^8.13.2",
+    "multer": "^1.4.5-lts.2",
+    "node-fetch": "^3.3.2",
+    "openai": "^4.95.1",
+    "rate-limit-redis": "^4.2.0",
+    "sharp": "^0.34.1",
+    "socket.io": "^4.8.1",
+    "tesseract.js": "^6.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

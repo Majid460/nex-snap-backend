@@ -1,0 +1,49 @@
+# Node modules
+node_modules/
+
+# Environment variables and secrets
+.env
+.env.*.local
+
+# Firebase credentials
+src/utils/serviceAccountKey.json
+
+# Firebase artifacts
+.firebase/
+firebase-debug.log
+.firebaserc
+firebase.json
+
+# Logs
+logs/
+*.log
+
+# Redis local DB dump (if applicable)
+dump.rdb
+
+# IDE/editor/workspace files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+
+# Test / coverage output
+coverage/
+.nyc_output/
+
+# npm / yarn artifacts
+.npm/
+yarn.lock
+package-lock.json
+
+# Optional build output if you later compile ES modules
+dist/
+build/
+
+# Misc
+*.local
+*.cache
+*.tgz
+
+# Tesseract trained data files
+*.traineddata
