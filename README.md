@@ -153,5 +153,66 @@ npm run dev
 ```bash
 npm run worker
 ```
+## 🛠️ Developer Setup Guide
+
+If you'd like to use the NexSnap backend in your own project, follow these steps:
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/yourusername/nexsnap-backend.git
+cd nexsnap-backend
+```
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+### 3. Setup Environment Variables
+
+Create a `.env` file in the root directory and include the following:
+
+```env
+PORT=3000
+MONGODB_CONNECT_URI=your_mongodb_connection_string
+SECRET_KEY=your_jwt_secret
+OPENAI_API_KEY=your_openai_api_key
+FIREBASE_STORAGE_BUCKET=your_firebase_bucket_name
+REDIS_URL=your_redis_connection_url
+```
+
+> ⚠️ Never commit your `.env` file to version control.
+
+### 4. Firebase Setup
+
+- Create a Firebase project and enable Firebase Storage.
+- Download your service account key JSON and save it in `src/utils/serviceAccountKey.json`.
+
+### 5. Redis & BullMQ
+
+Ensure Redis is running and accessible from your app.
+- For local testing, use [RedisInsight](https://redis.com/redis-enterprise/redis-insight/) or Docker.
+
+### 6. Run the App
+
+```bash
+npm run dev       # Runs the Express server
+npm run worker    # Runs the BullMQ worker (in a separate terminal)
+```
+
+### 7. Optional: Socket.IO Testing with Postman
+
+Use [Postman WebSocket feature](https://www.postman.com/websocket) to listen for real-time snap processing events.
+
+```
+Server emits:
+joinSnapRoom → { snapId: "<snap_id>" }
+snapDone:<snap_id> → { message: string, data: SnapItem }
+```
+
+You're now ready to integrate NexSnap with your mobile or web app!
+
 
 ---
