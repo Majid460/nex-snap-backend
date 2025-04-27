@@ -160,7 +160,7 @@ If you'd like to use the NexSnap backend in your own project, follow these steps
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/nexsnap-backend.git
+git clone https://github.com/Majid460/nex-snap-backend.git
 cd nexsnap-backend
 ```
 
